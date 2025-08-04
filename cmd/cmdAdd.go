@@ -30,52 +30,69 @@ import (
 )
 
 var (
-	csvPath     string
-	headers     []string
-	interactive bool
+	config  string
+	csvPath string
+	headers []string
+	noTUI   bool
 )
 
 var addCmd = &cobra.Command{
 	Use:   "add",
 	Short: chalk.Yellow.Color("Add a new record to your CSV."),
 	Long: chalk.Green.Color(chalk.Bold.TextStyle("zenith add")) + `
-Launch a flag-driven or interactive TUI workflow to append a row to your CSV.`,
+Launch a TUI-driven (default) or flag-driven workflow to append a row to your CSV.`,
 	Example: `
-  zenith add --csv-path=data.csv --headers=name,age,city
-  zenith add --interactive
+  # Load headers & csv-path from config.toml
+  zenith add --config=config.toml
+
+  # Override config and run in CLI mode
+  zenith add --config=config.toml --no-tui Alice 30 Oslo
+
+  # Direct flags without config
+  zenith add --csv-path=data.csv --headers=name,age,city --no-tui Bob 25 Paris
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		// 1. Load config & flags
+		// 1. Load config file if provided
+		if config != "" {
+			viper.SetConfigFile(config)
+			cobra.CheckErr(viper.ReadInConfig())
+		}
+
+		// 2. Bind flags into viper so flags override config
+		cobra.CheckErr(viper.BindPFlag("csv-path", cmd.Flags().Lookup("csv-path")))
+		cobra.CheckErr(viper.BindPFlag("headers", cmd.Flags().Lookup("headers")))
+
+		// 3. Resolve effective values
 		path := viper.GetString("csv-path")
 		hdrs := viper.GetStringSlice("headers")
 		if len(headers) > 0 {
 			hdrs = headers
 		}
 
-		// 2. Validate inputs
+		// 4. Validate
 		if path == "" {
-			cobra.CheckErr(fmt.Errorf("csv-path must be specified (via flag or config)"))
+			cobra.CheckErr(fmt.Errorf("csv-path must be specified (via --csv-path or config)"))
 		}
 		if len(hdrs) == 0 {
 			cobra.CheckErr(fmt.Errorf("no headers defined; use --headers or set in config"))
 		}
 
-		// 3. Collect record data
+		// 5. Collect record values
 		var record []string
-		if interactive {
+		if noTUI {
+			if len(args) != len(hdrs) {
+				cobra.CheckErr(fmt.Errorf("expected %d values, got %d", len(hdrs), len(args)))
+			}
+			record = args
+		} else {
 			model := newAddModel(hdrs)
 			p := tea.NewProgram(model)
 			out, err := p.Run()
 			cobra.CheckErr(err)
 			record = out.(addModel).values
-		} else {
-			if len(args) != len(hdrs) {
-				cobra.CheckErr(fmt.Errorf("expected %d values, got %d", len(hdrs), len(args)))
-			}
-			record = args
 		}
 
-		// 4. Open (or create) CSV and append
+		// 6. Open or create CSV, write header if empty
 		f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
 		cobra.CheckErr(err)
 		defer f.Close()
@@ -100,13 +117,12 @@ Launch a flag-driven or interactive TUI workflow to append a row to your CSV.`,
 func init() {
 	rootCmd.AddCommand(addCmd)
 
+	addCmd.Flags().StringVarP(&config, "config", "c", "", "TOML config file defining csv-path & headers")
 	addCmd.Flags().StringVarP(&csvPath, "csv-path", "f", "", "Path to your CSV file")
 	addCmd.Flags().StringSliceVarP(&headers, "headers", "H", []string{}, "Comma-separated list of CSV headers")
-	addCmd.Flags().BoolVarP(&interactive, "interactive", "i", false, "Use TUI to input fields")
+	addCmd.Flags().BoolVar(&noTUI, "no-tui", false, "Use non-interactive CLI mode to input values (default TUI)")
 
-	viper.BindPFlag("csv-path", addCmd.Flags().Lookup("csv-path"))
-	viper.BindPFlag("headers", addCmd.Flags().Lookup("headers"))
-
+	// Default CSV path if neither flag nor config provides one
 	viper.SetDefault("csv-path", "data.csv")
 }
 
@@ -123,7 +139,6 @@ func newAddModel(headers []string) addModel {
 		headers: headers,
 		values:  make([]string, len(headers)),
 	}
-
 	for i, h := range headers {
 		ti := textinput.New()
 		ti.Placeholder = h
@@ -136,7 +151,6 @@ func newAddModel(headers []string) addModel {
 		}
 		m.inputs = append(m.inputs, ti)
 	}
-
 	return m
 }
 
@@ -146,7 +160,6 @@ func (m addModel) Init() tea.Cmd {
 
 func (m addModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
-
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -162,14 +175,13 @@ func (m addModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	}
-
 	m.inputs[m.idx], cmd = m.inputs[m.idx].Update(msg)
 	return m, cmd
 }
 
 func (m addModel) View() string {
 	var b strings.Builder
-	b.WriteString("Enter record values:\n\n")
+	b.WriteString("Enter values for each header:\n\n")
 	for _, ti := range m.inputs {
 		b.WriteString(ti.View() + "\n")
 	}

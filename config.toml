@@ -1,0 +1,22 @@
+# config.toml
+# Zenith CLI configuration
+
+# Path to the CSV file
+csv-path = "data.csv"
+
+# Ordered list of CSV headers
+headers = [
+  "Name",
+  "Priority",
+  "Mode",
+  "Location",
+  "Organization",
+  "Role",
+  "Email",
+  "Linkedin",
+  "Context",
+  "Follow-up Action",
+  "Date",
+  "Description",
+  "Comments"
+]

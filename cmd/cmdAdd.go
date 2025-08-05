@@ -16,6 +16,8 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 package cmd
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 import (
 	"encoding/csv"
 	"fmt"
@@ -29,12 +31,11 @@ import (
 	"github.com/ttacon/chalk"
 )
 
-var (
-	config  string
-	csvPath string
-	headers []string
-	noTUI   bool
-)
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+var ()
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var addCmd = &cobra.Command{
 	Use:   "add",
@@ -51,6 +52,9 @@ Launch a TUI-driven (default) or flag-driven workflow to append a row to your CS
   # Direct flags without config
   zenith add --csv-path=data.csv --headers=name,age,city --no-tui Bob 25 Paris
 `,
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	Run: func(cmd *cobra.Command, args []string) {
 		// 1. Load config file if provided
 		if config != "" {
@@ -110,9 +114,11 @@ Launch a TUI-driven (default) or flag-driven workflow to append a row to your CS
 		writer.Flush()
 		cobra.CheckErr(writer.Error())
 
-		fmt.Println(chalk.Green.Color("✅ Record added successfully!"))
+		fmt.Println(chalk.Green.Color("Record added successfully!"))
 	},
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func init() {
 	rootCmd.AddCommand(addCmd)
@@ -125,6 +131,8 @@ func init() {
 	// Default CSV path if neither flag nor config provides one
 	viper.SetDefault("csv-path", "data.csv")
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // bubbletea model that steps through each header and collects its value
 type addModel struct {

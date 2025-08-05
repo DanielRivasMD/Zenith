@@ -3,3 +3,4 @@
 - bind arguments through toml config to be loaded or directly on cli call
 - variables will include: csv headers, csv path
 - the cli commands: add record, collect stats, render graph, visualize through bat / qsv
+- add home installation & completion for different configurations

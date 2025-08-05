@@ -6,6 +6,7 @@ csv-path = "data.csv"
 
 # Ordered list of CSV headers
 headers = [
+  "ID",
   "Name",
   "Priority",
   "Mode",

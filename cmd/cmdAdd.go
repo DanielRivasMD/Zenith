@@ -33,7 +33,9 @@ import (
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var ()
+var (
+	separator string
+)
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -47,10 +49,10 @@ Launch a TUI-driven (default) or flag-driven workflow to append a row to your CS
   zenith add --config=config.toml
 
   # Override config and run in CLI mode
-  zenith add --config=config.toml --no-tui Alice 30 Oslo
+  zenith add --config=config.toml --no-tui Alice;30;Oslo
 
   # Direct flags without config
-  zenith add --csv-path=data.csv --headers=name,age,city --no-tui Bob 25 Paris
+  zenith add --csv-path=data.csv --headers=name,age,city --no-tui Bob,25,Paris
 `,
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,10 +67,12 @@ Launch a TUI-driven (default) or flag-driven workflow to append a row to your CS
 		// 2. Bind flags into viper so flags override config
 		cobra.CheckErr(viper.BindPFlag("csv-path", cmd.Flags().Lookup("csv-path")))
 		cobra.CheckErr(viper.BindPFlag("headers", cmd.Flags().Lookup("headers")))
+		cobra.CheckErr(viper.BindPFlag("separator", cmd.Flags().Lookup("separator")))
 
 		// 3. Resolve effective values
 		path := viper.GetString("csv-path")
 		hdrs := viper.GetStringSlice("headers")
+		sep := viper.GetString("separator")
 		if len(headers) > 0 {
 			hdrs = headers
 		}
@@ -79,6 +83,9 @@ Launch a TUI-driven (default) or flag-driven workflow to append a row to your CS
 		}
 		if len(hdrs) == 0 {
 			cobra.CheckErr(fmt.Errorf("no headers defined; use --headers or set in config"))
+		}
+		if len(sep) != 1 {
+			cobra.CheckErr(fmt.Errorf("separator must be a single character"))
 		}
 
 		// 5. Collect record values
@@ -102,6 +109,7 @@ Launch a TUI-driven (default) or flag-driven workflow to append a row to your CS
 		defer f.Close()
 
 		writer := csv.NewWriter(f)
+		writer.Comma = rune(sep[0])
 		defer writer.Flush()
 
 		info, err := f.Stat()
@@ -123,13 +131,15 @@ Launch a TUI-driven (default) or flag-driven workflow to append a row to your CS
 func init() {
 	rootCmd.AddCommand(addCmd)
 
-	addCmd.Flags().StringVarP(&config, "config", "c", "", "TOML config file defining csv-path & headers")
+	addCmd.Flags().StringVarP(&config, "config", "c", "", "TOML config file defining csv-path, headers, separator")
 	addCmd.Flags().StringVarP(&csvPath, "csv-path", "f", "", "Path to your CSV file")
 	addCmd.Flags().StringSliceVarP(&headers, "headers", "H", []string{}, "Comma-separated list of CSV headers")
 	addCmd.Flags().BoolVar(&noTUI, "no-tui", false, "Use non-interactive CLI mode to input values (default TUI)")
+	addCmd.Flags().StringVarP(&separator, "separator", "s", ",", "Field separator for the output CSV file")
 
-	// Default CSV path if neither flag nor config provides one
+	// Bind defaults
 	viper.SetDefault("csv-path", "data.csv")
+	viper.SetDefault("separator", ",")
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

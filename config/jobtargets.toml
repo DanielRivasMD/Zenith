@@ -11,6 +11,7 @@ headers = [
   "ID",
   "Name",
   "Priority",
+  "Follow-up Action",
   "Mode",
   "Location",
   "Organization",
@@ -18,8 +19,7 @@ headers = [
   "Email",
   "Linkedin",
   "Context",
-  "Follow-up Action",
   "Date",
   "Description",
-  "Comments"
+  "Links"
 ]

@@ -22,6 +22,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -60,7 +61,16 @@ Launch a TUI-driven (default) or flag-driven workflow to append a row to your CS
 	Run: func(cmd *cobra.Command, args []string) {
 		// 1. Load config file if provided
 		if config != "" {
-			viper.SetConfigFile(config)
+			cfgDir := filepath.Join(os.Getenv("HOME"), ".zenith", "config")
+			name := config
+			if !strings.HasSuffix(name, ".toml") {
+				name += ".toml"
+			}
+			fullPath := filepath.Join(cfgDir, name)
+
+			// tell Viper this is TOML…
+			viper.SetConfigType("toml")
+			viper.SetConfigFile(fullPath)
 			cobra.CheckErr(viper.ReadInConfig())
 		}
 
@@ -137,9 +147,26 @@ func init() {
 	addCmd.Flags().BoolVar(&noTUI, "no-tui", false, "Use non-interactive CLI mode to input values (default TUI)")
 	addCmd.Flags().StringVarP(&separator, "separator", "s", ",", "Field separator for the output CSV file")
 
-	// Bind defaults
+	// bind defaults
 	viper.SetDefault("csv-path", "data.csv")
 	viper.SetDefault("separator", ",")
+
+	// register shell completion for --config: only .toml files in $HOME/.zenith/config/
+	addCmd.RegisterFlagCompletionFunc("config", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		dir := filepath.Join(os.Getenv("HOME"), ".zenith", "config")
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		var comps []string
+		for _, e := range entries {
+			if !e.IsDir() && strings.HasSuffix(e.Name(), ".toml") {
+				base := strings.TrimSuffix(e.Name(), ".toml")
+				comps = append(comps, base)
+			}
+		}
+		return comps, cobra.ShellCompDirectiveNoFileComp
+	})
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

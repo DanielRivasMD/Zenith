@@ -1,0 +1,25 @@
+# config.toml
+# Zenith CLI configuration
+
+# Absolute path to your CSV file (note the double‐quotes handle spaces)
+csv-path = "/Users/drivas/Library/Mobile Documents/com~apple~Numbers/Documents/Startups/Venture.csv"
+
+separator = ";"
+
+# Ordered list of CSV headers
+headers = [
+  "ID",
+  "Name",
+  "Priority",
+  "Follow-up Action",
+  "Mode",
+  "Location",
+  "Organization",
+  "Role",
+  "Email",
+  "Linkedin",
+  "Context",
+  "Date",
+  "Description",
+  "Links"
+]

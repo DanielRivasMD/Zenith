@@ -11,7 +11,7 @@ headers = [
   "ID",
   "Name",
   "Priority",
-  "Follow-up Action",
+  "Action",
   "Mode",
   "Location",
   "Organization",

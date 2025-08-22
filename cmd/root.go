@@ -16,31 +16,20 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 package cmd
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 import (
 	"github.com/DanielRivasMD/horus"
 	"github.com/spf13/cobra"
-	"github.com/ttacon/chalk"
-)
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-var (
-	config  string
-	noTUI   bool
-	csvPath string
-	headers []string
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var rootCmd = &cobra.Command{
-	Use:   "zenith",
-	Short: "Customize with your actual tool description",
-	Long: chalk.Green.Color(chalk.Bold.TextStyle("Daniel Rivas ")) + chalk.Dim.TextStyle(chalk.Italic.TextStyle("<danielrivasmd@gmail.com>")) + `
-
-` + chalk.Blue.Color("zenith") + `
-`,
-	Example: chalk.White.Color("zenith") + ` ` + chalk.Bold.TextStyle(chalk.White.Color("help")),
+	Use:     "zenith",
+	Short:   "Customize with your actual tool description",
+	Long:    helpRoot,
+	Example: exampleRoot,
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +40,23 @@ func Execute() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+var (
+	verbose bool
+	dbPath  string // populated by the --db flag
+)
+
+var (
+	config  string
+	noTUI   bool
+	csvPath string
+	headers []string
+)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 func init() {
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose diagnostics")
+	rootCmd.PersistentFlags().StringVar(&dbPath, "db", "zenith.db", "path to sqlite database")
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS tasks;
+
+DROP TABLE IF EXISTS interactions;
+
+DROP TABLE IF EXISTS contacts;
+
+DROP TABLE IF EXISTS organizations;
+

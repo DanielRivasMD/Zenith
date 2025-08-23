@@ -2,7 +2,7 @@
 PRAGMA foreign_keys = ON;
 
 ----------------------------------------------------------------------------------------------------
-CREATE TABLE organizations (
+CREATE TABLE orgs (
 	id integer PRIMARY KEY AUTOINCREMENT,
 	name text NOT NULL UNIQUE,
 	location text,
@@ -13,7 +13,7 @@ CREATE TABLE organizations (
 ----------------------------------------------------------------------------------------------------
 CREATE TABLE contacts (
 	id integer PRIMARY KEY AUTOINCREMENT,
-	organization integer NOT NULL REFERENCES organizations (id) ON DELETE CASCADE,
+	organization integer NOT NULL REFERENCES orgs (id) ON DELETE CASCADE,
 	name text NOT NULL,
 	role TEXT,
 	email text UNIQUE,

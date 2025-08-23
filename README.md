@@ -1,10 +1,9 @@
-# Zenith
+# Zenith: Where the start placed at its brightest
 
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](LICENSE)
 
 ## Overview
-Where the start placed at its brightest
-
+cli tool for CRM handling & visualizing
 
 ## Features
 

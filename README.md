@@ -50,4 +50,4 @@ cd Zenith
 ## License
 Copyright (c) 2025
 
-See the [LICENSE](LICENSE) file for license details.
+See the [LICENSE](LICENSE) file for license details

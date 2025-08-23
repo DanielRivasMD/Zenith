@@ -97,16 +97,22 @@ func runContactAdd(cmd *cobra.Command, args []string) {
 			Label:   "Organization ID",
 			Initial: "",
 			Parse: func(s string) (any, error) {
+				if strings.TrimSpace(s) == "" {
+					return int64(0), nil
+				}
 				i, err := strconv.ParseInt(s, 10, 64)
 				if err != nil {
 					return nil, err
 				}
-				return null.Int64From(i), nil
+				return i, nil
 			},
 			Assign: func(holder any, v any) {
-				reflect.ValueOf(holder).Elem().
-					FieldByName("Org").
-					Set(reflect.ValueOf(v))
+				rv := reflect.ValueOf(holder).Elem()
+				fv := rv.FieldByName("Org")
+				if !fv.IsValid() || !fv.CanSet() {
+					log.Fatalf("cannot set Org on %T", holder)
+				}
+				fv.SetInt(v.(int64))
 			},
 		},
 		{
@@ -188,16 +194,22 @@ func runContactEdit(cmd *cobra.Command, args []string) {
 			Label:   "Organization ID",
 			Initial: strconv.FormatInt(c.Org, 10),
 			Parse: func(s string) (any, error) {
+				if strings.TrimSpace(s) == "" {
+					return int64(0), nil
+				}
 				i, err := strconv.ParseInt(s, 10, 64)
 				if err != nil {
 					return nil, err
 				}
-				return null.Int64From(i), nil
+				return i, nil
 			},
 			Assign: func(holder any, v any) {
-				reflect.ValueOf(holder).Elem().
-					FieldByName("Organization").
-					Set(reflect.ValueOf(v))
+				rv := reflect.ValueOf(holder).Elem()
+				fv := rv.FieldByName("Org")
+				if !fv.IsValid() || !fv.CanSet() {
+					log.Fatalf("cannot set Org on %T", holder)
+				}
+				fv.SetInt(v.(int64))
 			},
 		},
 		{

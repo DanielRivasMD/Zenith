@@ -42,5 +42,11 @@ var helpMigrate = formatHelp(
 	"Apply any pending up or down migration scripts against the configured SQLite database",
 )
 
+var helpOrganization = formatHelp(
+	"Daniel Rivas",
+	"danielrivasmd@gmail.com",
+	"Apply any pending up or down migration scripts against the configured SQLite database",
+)
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

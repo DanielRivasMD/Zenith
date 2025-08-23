@@ -13,7 +13,7 @@ CREATE TABLE orgs (
 ----------------------------------------------------------------------------------------------------
 CREATE TABLE contacts (
 	id integer PRIMARY KEY AUTOINCREMENT,
-	organization integer NOT NULL REFERENCES orgs (id) ON DELETE CASCADE,
+	org integer NOT NULL REFERENCES orgs (id) ON DELETE CASCADE,
 	name text NOT NULL,
 	role TEXT,
 	email text UNIQUE,
@@ -23,7 +23,7 @@ CREATE TABLE contacts (
 );
 
 ----------------------------------------------------------------------------------------------------
-CREATE TABLE interactions (
+CREATE TABLE events (
 	id integer PRIMARY KEY AUTOINCREMENT,
 	contact integer NOT NULL REFERENCES contacts (id) ON DELETE CASCADE,
 	occurred DATETIME NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE interactions (
 ----------------------------------------------------------------------------------------------------
 CREATE TABLE tasks (
 	id integer PRIMARY KEY AUTOINCREMENT,
-	interaction integer REFERENCES interactions (id) ON DELETE SET NULL,
+	interaction integer REFERENCES events (id) ON DELETE SET NULL,
 	assigned integer,
 	title text NOT NULL,
 	duedate date,

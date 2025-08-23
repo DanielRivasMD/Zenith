@@ -1,6 +1,10 @@
-- cli application for filling up, parsing, visualizing & working with csv files through a tui interphase
-- go - cobra, viper, bubbletea & julia - unicodeplots frameworks
-- bind arguments through toml config to be loaded or directly on cli call
-- variables will include: csv headers, csv path
-- the cli commands: add record, collect stats, render graph, visualize through bat / qsv
+- julia - unicodeplots frameworks
+- the cli commands: stats, graph, table (visualize through bat / xan)
 - add home installation & completion for different configurations
+
+- format help
+- format examples
+- format export & add args completion
+
+==================================================
+==================================================

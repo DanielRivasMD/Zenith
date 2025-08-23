@@ -29,7 +29,10 @@ _default:
 # generate sql structs
 [group('dev')]
 @sqlboiler:
-  sqlboiler sqlite3
+  rm zenith.db && echo "cleaned database"
+  zenith migrate
+  rm -rf models && echo "purged models"
+  sqlboiler sqlite3 && echo "generated models"
 
 ####################################################################################################
 # import

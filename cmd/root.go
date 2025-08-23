@@ -19,8 +19,15 @@ package cmd
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 import (
+	"log"
+
 	"github.com/DanielRivasMD/horus"
+	_ "github.com/golang-migrate/migrate/v4/database/sqlite"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/cobra"
+
+	"github.com/DanielRivasMD/Zenith/db"
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,18 +52,26 @@ var (
 	dbPath  string // populated by the --db flag
 )
 
-var (
-	config  string
-	noTUI   bool
-	csvPath string
-	headers []string
-)
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose diagnostics")
 	rootCmd.PersistentFlags().StringVar(&dbPath, "db", "zenith.db", "path to sqlite database")
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func persistentPreRun(cmd *cobra.Command, args []string) {
+	if _, err := db.InitDB(dbPath); err != nil {
+		log.Fatalf("init DB: %v", err)
+	}
+}
+
+func persistentPostRun(cmd *cobra.Command, args []string) {
+	if db.Conn != nil {
+		_ = db.Conn.Close()
+		db.Conn = nil
+	}
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

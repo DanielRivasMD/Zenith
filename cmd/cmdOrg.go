@@ -39,8 +39,11 @@ import (
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 var orgCmd = &cobra.Command{
-	Use:               "org",
-	Short:             "Manage orgs",
+	Use:     "org",
+	Short:   "Manage orgs",
+	Long:    helpOrg,
+	Example: exampleOrg,
+
 	PersistentPreRun:  persistentPreRun,
 	PersistentPostRun: persistentPostRun,
 }
@@ -85,6 +88,8 @@ func init() {
 	orgCmd.AddCommand(orgAddCmd, orgEditCmd)
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
 func runOrgAdd(cmd *cobra.Command, args []string) {
 	org := &models.Org{}
 
@@ -123,8 +128,10 @@ func runOrgAdd(cmd *cobra.Command, args []string) {
 	if err := org.Insert(context.Background(), db.Conn, boil.Infer()); err != nil {
 		log.Fatalf("insert org: %v", err)
 	}
-	fmt.Printf("✅ Created org %d\n", org.ID.Int64)
+	fmt.Printf("Created org %d\n", org.ID.Int64)
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func runOrgEdit(cmd *cobra.Command, args []string) {
 	// Parse the ID
@@ -173,5 +180,7 @@ func runOrgEdit(cmd *cobra.Command, args []string) {
 	if _, err := org.Update(context.Background(), db.Conn, boil.Infer()); err != nil {
 		log.Fatalf("update org: %v", err)
 	}
-	fmt.Printf("✅ Updated org %d\n", org.ID.Int64)
+	fmt.Printf("Updated org %d\n", org.ID.Int64)
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////

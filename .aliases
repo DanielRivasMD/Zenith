@@ -3,7 +3,9 @@
 # or visit https://github.com/sebglazebrook/aliases
 
 ---
-sql: 
-  command: litecli zenith.db
 ji: 
   command: just install
+jt: 
+  command: just todor
+sql: 
+  command: litecli zenith.db

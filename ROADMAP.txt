@@ -7,4 +7,7 @@
 - format export & add args completion
 
 ==================================================
+cmd/cmdExport.go
+  line 39     TODO   format cmd
+  line 40     TODO   add completions for tables
 ==================================================

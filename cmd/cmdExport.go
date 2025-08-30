@@ -45,11 +45,11 @@ var (
 		Long: `Export specified tables from the database into CSV files in the
 current working directory. Supported table names:
 
-  orgs, contacts, interactions, tasks
+  orgs, contacts, events, tasks
 
 Use --all to export every supported table.`,
 		Example: `  zenith export orgs
-  zenith export contacts interactions
+  zenith export contacts events
   zenith export --all`,
 		PersistentPreRun:  persistentPreRun,
 		PersistentPostRun: persistentPostRun,
@@ -70,7 +70,7 @@ func init() {
 func runExport(cmd *cobra.Command, args []string) {
 	// Determine which tables to export
 	if exportAll {
-		args = []string{"orgs", "contacts", "interactions", "tasks"}
+		args = []string{"orgs", "contacts", "events", "tasks"}
 	}
 	if len(args) == 0 {
 		// return fmt.Errorf("must specify at least one table or use --all")
@@ -87,8 +87,8 @@ func runExport(cmd *cobra.Command, args []string) {
 			if err := exportContacts(cmd.Context(), db.Conn); err != nil {
 				// return err
 			}
-		case "interactions":
-			if err := exportInteractions(cmd.Context(), db.Conn); err != nil {
+		case "events":
+			if err := exportEvents(cmd.Context(), db.Conn); err != nil {
 				// return err
 			}
 		case "tasks":
@@ -185,15 +185,15 @@ func exportContacts(ctx context.Context, conn *sql.DB) error {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-func exportInteractions(ctx context.Context, conn *sql.DB) error {
+func exportEvents(ctx context.Context, conn *sql.DB) error {
 	rows, err := models.Events(qm.OrderBy("id ASC")).All(ctx, conn)
 	if err != nil {
-		return fmt.Errorf("query interactions: %w", err)
+		return fmt.Errorf("query events: %w", err)
 	}
 
-	file, err := os.Create("interactions.csv")
+	file, err := os.Create("events.csv")
 	if err != nil {
-		return fmt.Errorf("create interactions.csv: %w", err)
+		return fmt.Errorf("create events.csv: %w", err)
 	}
 	defer file.Close()
 
@@ -227,7 +227,7 @@ func exportInteractions(ctx context.Context, conn *sql.DB) error {
 		}
 	}
 
-	fmt.Println("exported interactions.csv")
+	fmt.Println("exported events.csv")
 	return nil
 }
 
